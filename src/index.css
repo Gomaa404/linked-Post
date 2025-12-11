@@ -1,0 +1,39 @@
+@import "tailwindcss";
+@import "flowbite-react/plugin/tailwindcss";
+@source "../.flowbite-react/class-list.json";
+@plugin "daisyui";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+.active{
+    background: #000;
+    color: #fff;
+}
+
+.dark .active{
+    background: #1f2937;
+    color: #fff;
+}
+
+.dark .menu li > * {
+    color: #e5e7eb !important;
+}
+
+.dark .menu li > *:hover {
+    background-color: #374151 !important;
+    color: #fff !important;
+}
+
+.dark .menu a {
+    color: #e5e7eb !important;
+}
+
+.dark .menu a:hover {
+    background-color: #374151 !important;
+    color: #fff !important;
+}
+
+.dark .menu .active {
+    background-color: #374151 !important;
+    color: #fff !important;
+}
