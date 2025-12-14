@@ -1,101 +1,109 @@
-Linked Post App
+🔗 Linked Post App
 
-🔗 Live Demo
-
-https://linked-post-seven.vercel.app/
+A modern, social media–style web application built with React that allows users to share posts, engage through comments, and manage their profiles with a clean and responsive UI.
 
 ⸻
 
-📌 About The Project
+🌐 Live Demo
 
-Linked Post App is a simple social media–style web application that allows users to register, log in, create posts, and interact with them through comments.
-
-The project focuses on applying modern React concepts, state management, and API integration in a real-world scenario.
+👉 Live Preview: https://linked-post-seven.vercel.app/
 
 ⸻
 
-🚀 Features
-	•	User registration
-	•	User login & logout
-	•	Create posts
-	•	Edit & delete posts
-	•	Add comments to posts
-	•	User profile page
-	•	Dark mode support
-	•	Toast notifications
+📖 Overview
+
+Linked Post App is a frontend-focused project designed to simulate the core features of a social networking platform. It demonstrates real-world usage of modern React patterns, efficient state management, authentication handling, and API integration.
+
+The main goal of this project is learning by building — applying best practices while keeping the codebase clean, scalable, and easy to understand.
 
 ⸻
 
-🛠️ Built With
-	•	React.js
-	•	React Router DOM
-	•	Tailwind CSS
-	•	TanStack React Query
-	•	Axios
-	•	Context API
-	•	JWT Authentication
-	•	Vercel (Deployment)
+✨ Key Features
+	•	🔐 User authentication (Register / Login / Logout)
+	•	📝 Create, edit, and delete posts
+	•	💬 Comment on posts
+	•	👤 User profile page
+	•	🌙 Dark mode support
+	•	🔔 Toast notifications for user feedback
+	•	🔒 Protected routes & actions
 
 ⸻
 
-📂 Project Structure
+🧰 Tech Stack
+	•	React.js – Component-based UI
+	•	React Router DOM – Client-side routing
+	•	Tailwind CSS – Utility-first styling
+	•	TanStack React Query – Server state management
+	•	Axios – HTTP requests
+	•	Context API – Global state handling
+	•	JWT Authentication – Secure user sessions
+	•	Vercel – Deployment & hosting
+
+⸻
+
+📁 Project Structure
 
 src/
-├── Api/
-├── assets/
-├── components/
-├── context/
-├── pages/
-├── routes/
-└── main.jsx
+├── Api/          # API requests & services
+├── assets/       # Images & static files
+├── components/   # Reusable UI components
+├── context/      # Global context providers
+├── pages/        # Application pages
+├── routes/       # Route definitions
+└── main.jsx      # App entry point
 
 
 ⸻
 
-🔐 Authentication
+🔐 Authentication Flow
 	•	JWT token is stored after successful login
-	•	Protected actions require authentication
-	•	Users cannot create, edit, or delete posts without logging in
+	•	Protected routes prevent unauthorized access
+	•	Only authenticated users can:
+	•	Create posts
+	•	Edit or delete their own posts
+	•	Add comments
 
 ⸻
 
-▶️ Run Locally
+▶️ Getting Started (Local Setup)
 
-To run the project locally:
+Clone the repository and run the project locally:
 
 git clone <repository-url>
 cd linked-post
 npm install
 npm run dev
 
-Then open your browser at:
+Open your browser at:
 
 http://localhost:5173
 
 
 ⸻
 
-📸 Screens
+🖼️ Screenshots
 	•	Login Page
 	•	Register Page
-	•	Home (Posts)
-	•	Profile Page
+	•	Home Feed (Posts)
+	•	User Profile Page
 
 ⸻
 
-⚠️ Notes
-	•	This is a frontend-only project
-	•	It depends on an external API
-	•	Created for learning and practice purposes
+⚠️ Important Notes
+	•	This is a frontend-only application
+	•	It relies on an external API for data
+	•	Built strictly for learning and practice purposes
 
 ⸻
 
 👨‍💻 Author
 
-Developed for learning and practice purposes.
+Developed as a hands-on project to practice modern frontend development with React.
 
 ⸻
 
-⭐ Acknowledgments
+🙌 Acknowledgments
 
-Thanks to all open-source libraries used in this project.
+Special thanks to the open-source community and the libraries that made this project possible.
+
+⭐ If you find this project helpful, feel free to give it a star!
