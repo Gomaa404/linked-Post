@@ -6,7 +6,7 @@ A modern, social media–style web application built with React that allows user
 
 🌐 Live Demo
 
-👉 Live Preview: https://linked-post-seven.vercel.app/
+👉 Live Preview: https://linked-post-seven.vercel.app
 
 ⸻
 
