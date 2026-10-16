@@ -1,42 +1,45 @@
-import { createContext, useEffect, useState } from "react";
-import { getLoggedUser } from "../Api/Auth/loggedUser.api";
-
+import { createContext, useEffect, useState, useCallback } from "react";
+import { getLoggedUser } from "@/Api";
 
 export const tokenContext = createContext();
 
+export default function TokenContextProvider({ children }) {
+  const [token, setToken] = useState(() => localStorage.getItem("token"));
+  const [userData, setUserData] = useState(null);
+  const [isLoadingUser, setIsLoadingUser] = useState(false);
 
-export default function TokenContextProvider(props) {
-    const [token, setToken] = useState(null);
-    const [userData, setUserData] = useState(null);
-    
-    async function getUserData() {
-        try {
-            const res = await getLoggedUser();
-            console.log(res);
-            setUserData(res.user);
-        } catch (error) {
-            console.error("Failed to fetch user data:", error);
-            setUserData(null);
-        }
+  const refreshUser = useCallback(async () => {
+    if (!localStorage.getItem("token")) {
+      setUserData(null);
+      return null;
     }
+    setIsLoadingUser(true);
+    try {
+      const res = await getLoggedUser();
+      setUserData(res?.data?.user || null);
+      return res?.data?.user || null;
+    } catch (error) {
+      console.error("Failed to fetch user data:", error);
+      setUserData(null);
+      return null;
+    } finally {
+      setIsLoadingUser(false);
+    }
+  }, []);
 
-    useEffect(() => {
-        const storedToken = localStorage.getItem("token");
-        if (storedToken) {
-            setToken(storedToken);
-        }
-    }, []);
+  useEffect(() => {
+    if (token) {
+      refreshUser();
+    } else {
+      setUserData(null);
+    }
+  }, [token, refreshUser]);
 
-    // Fetch user data whenever token changes
-    useEffect(() => {
-        if (token) {
-            getUserData();
-        } else {
-            setUserData(null);
-        }
-    }, [token]);
-
-    return <tokenContext.Provider value={{ token, setToken, userData, setUserData }}>
-        {props.children}
-    </tokenContext.Provider>;
+  return (
+    <tokenContext.Provider
+      value={{ token, setToken, userData, setUserData, refreshUser, isLoadingUser }}
+    >
+      {children}
+    </tokenContext.Provider>
+  );
 }

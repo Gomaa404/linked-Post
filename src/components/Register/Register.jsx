@@ -1,156 +1,224 @@
-import React from "react";
+import { useContext, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import axios from "axios";
-import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate } from "react-router-dom";
+import * as z from "zod";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
+import toast from "react-hot-toast";
+
+import { signup } from "@/Api";
+import { tokenContext } from "@/context/tokenContext.jsx";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { getErrorMessage } from "@/lib/format";
+import { cn } from "@/lib/utils";
+
+const schema = z
+  .object({
+    name: z.string().min(3, "Name must be at least 3 characters"),
+    username: z
+      .string()
+      .min(3, "Username must be at least 3 characters")
+      .regex(/^\S+$/, "Username cannot contain spaces"),
+    email: z.string().email("Invalid email"),
+    dateOfBirth: z.string().refine(
+      (value) => {
+        const age = new Date().getFullYear() - new Date(value).getFullYear();
+        return !!value && age >= 13;
+      },
+      { message: "You must be at least 13 years old" }
+    ),
+    gender: z.enum(["male", "female"], { message: "Gender is required" }),
+    password: z
+      .string()
+      .regex(
+        /^(?=.*[A-Za-z])(?=.*\d).{8,}$/,
+        "At least 8 characters, including a letter and a number"
+      ),
+    rePassword: z.string(),
+  })
+  .refine((data) => data.password === data.rePassword, {
+    message: "Passwords do not match",
+    path: ["rePassword"],
+  });
 
 export default function Register() {
-  const navigate = useNavigate(); 
-  const schema = z
-    .object({
-      name: z.string().min(3, "Name must be at least 3 characters"),
-      email: z.string().email("Invalid email").nonempty("Email is required"),
-      password: z
-        .string()
-        .regex(
-          /^(?=.*[A-Za-z])(?=.*\d).{8,}$/,
-          "Password must be at least 8 characters and include a letter and a number"
-        ),
-      rePassword: z.string(),
-      dateOfBirth: z.string().refine(
-        (val) => {
-          const age = new Date().getFullYear() - new Date(val).getFullYear();
-          return age >= 13;
-        },
-        { message: "You must be at least 13 years old" }
-      ),
-      gender: z
-        .enum(["male", "female"])
-        .refine((val) => !!val, { message: "Gender is required" }),
-    })
-    .refine((data) => data.password === data.rePassword, {
-      message: "Passwords do not match",
-      path: ["rePassword"],
-    });
-
+  const navigate = useNavigate();
+  const { setToken } = useContext(tokenContext);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    watch,
     setError,
+    formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(schema),
+    defaultValues: { gender: "male" },
   });
+
   async function onSubmit(values) {
     try {
-      const { data } = await axios.post(
-        "https://linked-posts.routemisr.com/users/signup",
-        values
-      );
-      if (data.message.includes("success")) {
-        navigate("/login");
+      const res = await signup(values);
+      const token = res?.data?.token;
+      if (!res?.success || !token) {
+        setError("root", { message: res?.message || "Could not create account" });
         return;
       }
-      if (data?.error || data?.message) {
-        setError("root", { message: data.error || data.message });
-      }
-    } catch (err) {
-      setError("root", {
-        message:
-          err.response?.data?.error ||
-          err.response?.data?.message ||
-          err.message,
-      });
+      localStorage.setItem("token", token);
+      setToken(token);
+      toast.success("Account created. Welcome!");
+      navigate("/");
+    } catch (error) {
+      setError("root", { message: getErrorMessage(error, "Could not create account") });
     }
   }
 
-  return (
-    <div className="w-[90%] md:w-[50%] m-15 mx-auto p-5  shadow-lg dark:shadow-sm rounded-xl bg-white dark:bg-gray-800 transition-colors">
-      <h1 className="text-sky-800 dark:text-sky-400 text-3xl font-semibold">Register New User</h1>
-      <form onSubmit={handleSubmit(onSubmit)} className="my-4">
-        {errors.name && <p className="text-red-600 dark:text-red-400">{errors.name.message}</p>}
-        <input
-          {...register("name")}
-          className="input w-full mb-4 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600"
-          placeholder="Enter your name"
-          autoComplete="name"
-          aria-invalid={errors.name ? "true" : "false"}
-        />
-        {errors.email && <p className="text-red-600 dark:text-red-400">{errors.email.message}</p>}
-        <input
-          {...register("email")}
-          type="email"
-          className="input w-full mb-4 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600"
-          placeholder="Enter your email"
-          autoComplete="email"
-          aria-invalid={errors.email ? "true" : "false"}
-        />
-        {errors.password && (
-          <p className="text-red-600 dark:text-red-400">{errors.password.message}</p>
-        )}
-        <input
-          {...register("password")}
-          type="password"
-          className="input w-full mb-4 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600"
-          placeholder="Enter your password"
-          autoComplete="new-password"
-          aria-invalid={errors.password ? "true" : "false"}
-        />
-        {errors.rePassword && (
-          <p className="text-red-600 dark:text-red-400">{errors.rePassword.message}</p>
-        )}
-        <input
-          {...register("rePassword")}
-          type="password"
-          className="input w-full mb-4 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600"
-          placeholder="Confirm your password"
-          autoComplete="new-password"
-          aria-invalid={errors.rePassword ? "true" : "false"}
-        />
-        {errors.dateOfBirth && (
-          <p className="text-red-600 dark:text-red-400">{errors.dateOfBirth.message}</p>
-        )}
-        <input
-          {...register("dateOfBirth")}
-          type="date"
-          className="input w-full mb-4 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600"
-          aria-invalid={errors.dateOfBirth ? "true" : "false"}
-        />
-        {errors.gender && (
-          <p className="text-red-600 dark:text-red-400">{errors.gender.message}</p>
-        )}
-        <div className="w-full mb-4">
-          <input
-            {...register("gender")}
-            type="radio"
-            id="m"
-            value="male"
-            className="radio radio-primary"
-          />
-          <label htmlFor="m" className="mx-2 text-gray-900 dark:text-gray-100">
-            Male
-          </label>
+  const gender = watch("gender");
 
-          <input
-            {...register("gender")}
-            type="radio"
-            id="f"
-            value="female"
-            className="radio radio-primary"
-          />
-          <label htmlFor="f" className="mx-2 text-gray-900 dark:text-gray-100">
-            Female
-          </label>
-        </div>
-        {errors.root && <p className="text-red-600 dark:text-red-400">{errors.root.message}</p>}
-        <button
-          type="submit"
-          className="text-slate-200 bg-sky-700 hover:bg-sky-900 dark:bg-sky-600 dark:hover:bg-sky-700 px-6 py-3 rounded-md transition-colors"
-        >
-          {isSubmitting ? "Loading..." : "Signup"}
-        </button>
-      </form>
+  return (
+    <div className="bg-card overflow-hidden rounded-xl border shadow-sm">
+      <div className="p-6 sm:p-7">
+        <h1 className="text-xl font-semibold tracking-tight">Create your account</h1>
+        <p className="text-muted-foreground mt-1 text-sm">
+          Join nouxer and start sharing with the community.
+        </p>
+
+        <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-4" noValidate>
+          {errors.root ? (
+            <div className="border-destructive/30 bg-destructive/10 text-destructive rounded-lg border px-3 py-2 text-sm">
+              {errors.root.message}
+            </div>
+          ) : null}
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="name">Full name</Label>
+              <Input id="name" placeholder="Ahmed Bahnasy" {...register("name")} />
+              {errors.name ? (
+                <p className="text-destructive text-xs">{errors.name.message}</p>
+              ) : null}
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="username">Username</Label>
+              <Input id="username" placeholder="ahmed_dev" {...register("username")} />
+              {errors.username ? (
+                <p className="text-destructive text-xs">{errors.username.message}</p>
+              ) : null}
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="email">Email</Label>
+            <Input id="email" type="email" placeholder="you@example.com" {...register("email")} />
+            {errors.email ? (
+              <p className="text-destructive text-xs">{errors.email.message}</p>
+            ) : null}
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="dateOfBirth">Date of birth</Label>
+              <Input id="dateOfBirth" type="date" {...register("dateOfBirth")} />
+              {errors.dateOfBirth ? (
+                <p className="text-destructive text-xs">{errors.dateOfBirth.message}</p>
+              ) : null}
+            </div>
+            <div className="space-y-1.5">
+              <Label>Gender</Label>
+              <div className="flex gap-2">
+                {["male", "female"].map((option) => (
+                  <label
+                    key={option}
+                    className={cn(
+                      "flex h-9 flex-1 cursor-pointer items-center justify-center rounded-md border text-sm capitalize transition-colors",
+                      gender === option
+                        ? "border-primary bg-primary/10 text-primary font-medium"
+                        : "hover:bg-accent"
+                    )}
+                  >
+                    <input type="radio" value={option} className="sr-only" {...register("gender")} />
+                    {option}
+                  </label>
+                ))}
+              </div>
+              {errors.gender ? (
+                <p className="text-destructive text-xs">{errors.gender.message}</p>
+              ) : null}
+            </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="password">Password</Label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="new-password"
+                  placeholder="••••••••"
+                  className="pr-10"
+                  {...register("password")}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 transition-colors"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                </button>
+              </div>
+              {errors.password ? (
+                <p className="text-destructive text-xs">{errors.password.message}</p>
+              ) : null}
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="rePassword">Confirm password</Label>
+              <div className="relative">
+                <Input
+                  id="rePassword"
+                  type={showConfirm ? "text" : "password"}
+                  autoComplete="new-password"
+                  placeholder="••••••••"
+                  className="pr-10"
+                  {...register("rePassword")}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirm((v) => !v)}
+                  className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 transition-colors"
+                  aria-label={showConfirm ? "Hide password" : "Show password"}
+                >
+                  {showConfirm ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                </button>
+              </div>
+              {errors.rePassword ? (
+                <p className="text-destructive text-xs">{errors.rePassword.message}</p>
+              ) : null}
+            </div>
+          </div>
+
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? (
+              <>
+                <Loader2 className="size-4 animate-spin" /> Creating account...
+              </>
+            ) : (
+              "Create account"
+            )}
+          </Button>
+        </form>
+      </div>
+
+      <div className="bg-muted/40 border-t px-6 py-4 text-center text-sm">
+        <span className="text-muted-foreground">Already have an account? </span>
+        <Link to="/login" className="text-primary font-medium hover:underline">
+          Sign in
+        </Link>
+      </div>
     </div>
   );
 }

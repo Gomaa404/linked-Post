@@ -1,109 +1,62 @@
-🔗 Linked Post App
+# nouxer
 
-A modern, social media–style web application built with React that allows users to share posts, engage through comments, and manage their profiles with a clean and responsive UI.
+A modern social network built with React — share posts, like, comment and
+reply, bookmark, follow people, and get notified.
 
-⸻
+## ✨ Features
 
-🌐 Live Demo
+- 🔐 Auth — register, login, change password, upload profile photo
+- 📝 Posts — create (text/image), edit, delete, share
+- 👍 Engagement — like, comment, reply, like comments
+- 🔖 Bookmarks — save posts and revisit them
+- 👥 Social graph — follow/unfollow, suggestions, followers/following lists
+- 🔔 Notifications — list, unread badge, mark one/all as read
+- 🧭 Feed tabs — All, Following, My posts (+ "with image" filter)
+- 🌙 Dark mode
+- 🍞 Toasts and skeleton loaders
 
-👉 Live Preview: https://linked-post-seven.vercel.app
+## 🧰 Tech Stack
 
-⸻
+- **React 19** + **React Router**
+- **Tailwind CSS v4** + **shadcn/ui** (Radix primitives, `lucide-react`)
+- **TanStack Query** — server state, caching and pagination
+- **Axios** — HTTP client
+- **React Hook Form** + **Zod** — forms & validation
+- **react-hot-toast** — feedback
 
-📖 Overview
+## 📁 Project Structure
 
-Linked Post App is a frontend-focused project designed to simulate the core features of a social networking platform. It demonstrates real-world usage of modern React patterns, efficient state management, authentication handling, and API integration.
-
-The main goal of this project is learning by building — applying best practices while keeping the codebase clean, scalable, and easy to understand.
-
-⸻
-
-✨ Key Features
-	•	🔐 User authentication (Register / Login / Logout)
-	•	📝 Create, edit, and delete posts
-	•	💬 Comment on posts
-	•	👤 User profile page
-	•	🌙 Dark mode support
-	•	🔔 Toast notifications for user feedback
-	•	🔒 Protected routes & actions
-
-⸻
-
-🧰 Tech Stack
-	•	React.js – Component-based UI
-	•	React Router DOM – Client-side routing
-	•	Tailwind CSS – Utility-first styling
-	•	TanStack React Query – Server state management
-	•	Axios – HTTP requests
-	•	Context API – Global state handling
-	•	JWT Authentication – Secure user sessions
-	•	Vercel – Deployment & hosting
-
-⸻
-
-📁 Project Structure
-
+```
 src/
-├── Api/          # API requests & services
-├── assets/       # Images & static files
-├── components/   # Reusable UI components
-├── context/      # Global context providers
-├── pages/        # Application pages
-├── routes/       # Route definitions
-└── main.jsx      # App entry point
+├── Api/            # One module per backend area + shared axios client
+├── components/
+│   ├── ui/                # shadcn/ui primitives
+│   ├── common/            # avatar, follow button, user list, states
+│   ├── post/              # PostCard, composer, comments, dialogs
+│   ├── Layout/ Navbar/ Home/ Explore/ Bookmarks/ Notifications/ Profile/
+│   └── Login/ Register/ NotFound/
+├── context/        # token + dark mode providers
+├── hooks/          # usePostActions (like/bookmark)
+├── lib/            # cn() helper + formatting utilities
+└── main.jsx        # app entry point
+```
 
+## ▶️ Getting Started
 
-⸻
-
-🔐 Authentication Flow
-	•	JWT token is stored after successful login
-	•	Protected routes prevent unauthorized access
-	•	Only authenticated users can:
-	•	Create posts
-	•	Edit or delete their own posts
-	•	Add comments
-
-⸻
-
-▶️ Getting Started (Local Setup)
-
-Clone the repository and run the project locally:
-
+```bash
 git clone <repository-url>
-cd linked-post
+cd linked-Post
 npm install
 npm run dev
+```
 
-Open your browser at:
+Open http://localhost:5173
 
-http://localhost:5173
+## 📜 Scripts
 
-
-⸻
-
-🖼️ Screenshots
-	•	Login Page
-	•	Register Page
-	•	Home Feed (Posts)
-	•	User Profile Page
-
-⸻
-
-⚠️ Important Notes
-	•	This is a frontend-only application
-	•	It relies on an external API for data
-	•	Built strictly for learning and practice purposes
-
-⸻
-
-👨‍💻 Author
-
-Developed as a hands-on project to practice modern frontend development with React.
-
-⸻
-
-🙌 Acknowledgments
-
-Special thanks to the open-source community and the libraries that made this project possible.
-
-⭐ If you find this project helpful, feel free to give it a star!
+| Command | Description |
+| --- | --- |
+| `npm run dev` | Start the Vite dev server |
+| `npm run build` | Production build |
+| `npm run preview` | Preview the production build |
+| `npm run lint` | ESLint |
